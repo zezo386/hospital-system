@@ -98,9 +98,29 @@ export function CreateServerFunctions({ auth, pool, resend}: ActionDependencies)
         revalidatePath("/dashboard");
     }
 
+    async function notify(){
+        const peopleToNotify = await pool.query(
+            `SELECT DISTINCT u.email FROM users u JOIN appointments a ON u.id = a.patient_id WHERE a.appointment_date_start < NOW() + INTERVAL '5 hours' AND a.appointment_date_start > NOW() AND a.notified = false`
+        );
+
+        await pool.query(
+            `UPDATE appointments SET notified = true WHERE appointment_date_start < NOW() + INTERVAL '5 hours' AND appointment_date_start > NOW() AND notified = false`
+        )
+
+        for (let user of peopleToNotify.rows) {
+            resend.emails.send({
+                to: user.email,
+                from: "Hospital test <onboarding@resend.dev>",
+                subject: "Upcoming Appointment Reminder",
+                html: `<p>Dear ${user.name},</p>`
+            })
+        }
+    }
+
     return {
         get_doctors,
         get_appointments,
-        create_appointment
+        create_appointment,
+        notify
     }
 }
