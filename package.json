@@ -14,7 +14,8 @@
     "next-auth": "^5.0.0-beta.32",
     "pg": "^8.23.1",
     "react": "19.3.0",
-    "react-dom": "19.3.0"
+    "react-dom": "19.3.0",
+    "resend": "^6.35.0"
   },
   "devDependencies": {
     "@tailwindcss/turbopack": "^4",
